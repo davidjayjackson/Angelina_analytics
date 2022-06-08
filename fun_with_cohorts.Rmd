@@ -1,0 +1,68 @@
+---
+title: "Cohort Analysis"
+author: "David Jackson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(cohorts)
+library(readxl)
+library(lubridate)
+```
+
+## R Markdown
+
+```{r}
+rm(list = ls())
+retail_sales <- read_xlsx("./Online Retail.xlsx") %>% na.omit()
+summary(retail_sales$CustomerID)
+```
+```{r}
+retail_sales <- retail_sales %>% janitor::clean_names()
+# retail_sales <- retail_sales %>% janitor::remove_empty(which = c("rows","cols"))
+retail_sales$Ymd <- as.Date(retail_sales$invoice_date)
+```
+
+```{r}
+cohort_data <- retail_sales %>% select(customer_id,Ymd)
+summary(cohort_data)
+```
+
+### Chort Table by Month
+
+```{r}
+cohort_data %>%
+  cohort_table_month(customer_id,Ymd)
+
+```
+
+### Creating a day level cohort table
+
+```{r}
+cohort_data %>%
+  cohort_table_day(customer_id,Ymd)
+```
+
+### Converting to percentages
+
+```{r}
+cohort_data  %>%
+  cohort_table_month(customer_id,Ymd) %>% cohort_table_pct(decimals = 1)
+```
+
+#### Left-shifted cohort tables
+
+```{r}
+cohort_data  %>%
+  cohort_table_month(customer_id,Ymd) %>% shift_left()
+```
+
+### We can also get the raw numbers as percentages.
+
+```{r}
+cohort_data  %>%
+  cohort_table_month(customer_id,Ymd) %>% shift_left_pct()
+```
