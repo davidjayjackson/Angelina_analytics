@@ -1,0 +1,33 @@
+---
+title: "Cohort Analysis (i.e Customer Retention)"
+author: "David Jackson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(cohorts)
+
+```
+
+## Data Wrangling
+
+```{r}
+rm(list = ls())
+retail_sales <- read_xlsx("./Online Retail.xlsx")
+summary(retail_sales$CustomerID)
+```
+
+```{r}
+retail_sales <- retail_sales %>% janitor::clean_names()  %>% na.omit()
+retail_sales$Ymd <- as.Date(retail_sales$invoice_date)
+```
+```{r}
+cohort_data <- retail_sales %>% select(customer_id,Ymd)
+summary(cohort_data)
+```
+### Begin Cohort (i.e. Customer Churn, Customer Retention) Analysis
